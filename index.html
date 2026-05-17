@@ -32,7 +32,9 @@
 body {
     font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
     min-height: 100vh;
-    overflow: hidden;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: hidden;
     user-select: none;
     color: #17324a;
     background:
@@ -219,6 +221,7 @@ button:hover {
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
 }
 
 #scale {
@@ -513,54 +516,272 @@ button:hover {
     }
 }
 
-@media (max-width: 640px) {
-    body {
-        overflow: auto;
-    }
-
-    #gameArea {
-        min-height: 860px;
-    }
-
+@media (max-width: 1024px) and (orientation: portrait) {
     #ui {
-        position: static;
-        margin: 8px auto 0;
+        width: min(230px, calc(100vw - 20px));
     }
 
     #scale {
-        top: 290px;
-        height: 320px;
+        top: 46%;
+        height: min(430px, 44vh);
+    }
+
+    #weightArea {
+        width: min(94vw, 860px);
+        min-height: 170px;
+        padding: 14px;
+    }
+
+    .buttonRow {
+        flex-wrap: wrap;
+    }
+
+    .buttonRow button {
+        flex: 1 1 calc(50% - 4px);
+    }
+
+    #codeBtn {
+        flex-basis: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    #gameArea {
+        width: 100%;
+        height: auto;
+        min-height: calc(100dvh - 8px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 0 24px;
+    }
+
+    #ui {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: min(94vw, 520px);
+        margin: 0 auto 10px;
+        padding: 10px;
+    }
+
+    .controlRow {
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .controlRow label {
+        width: 100%;
+    }
+
+    select {
+        width: 100%;
+    }
+
+    #scoreBoard,
+    #totalInfo {
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+    }
+
+    .buttonRow {
+        flex-wrap: wrap;
+    }
+
+    .buttonRow button {
+        flex: 1 1 calc(50% - 4px);
+        min-height: 44px;
+    }
+
+    #codeBtn {
+        flex-basis: 100%;
+    }
+
+    #codeOutput {
+        height: 220px;
+        font-size: 10px;
+    }
+
+    #scale {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        width: min(96vw, 700px);
+        height: 280px;
+        margin: 0 auto 10px;
+    }
+
+    #shadow {
+        width: 64%;
     }
 
     #beam {
-        top: 104px;
-        width: min(410px, 76vw);
+        top: 96px;
+        width: min(410px, 78vw);
         height: 20px;
     }
 
     #pivot {
-        top: 90px;
+        top: 82px;
+        width: 34px;
+        height: 34px;
     }
 
     #base {
-        width: 90px;
-        height: 170px;
+        width: 86px;
+        height: 156px;
+        bottom: 30px;
     }
 
     #basePedestal {
-        width: 180px;
+        width: 170px;
+        height: 36px;
     }
 
     .hanger {
-        top: 98px;
-        transform: scale(0.74);
+        top: 90px;
+        transform: scale(0.7);
+    }
+
+    #leftHanger {
+        left: max(4px, calc(50% - min(250px, 35vw) - 60px));
+    }
+
+    #rightHanger {
+        right: max(4px, calc(50% - min(250px, 35vw) - 60px));
     }
 
     #weightArea {
-        top: 540px;
+        position: relative;
+        left: auto;
         bottom: auto;
-        transform: translateX(-50%);
-        width: 94vw;
+        transform: none;
+        width: min(94vw, 720px);
+        min-height: 160px;
+        padding: 12px;
+        border-radius: 22px;
+        gap: 10px;
+        margin: 0 auto;
+    }
+
+    .weight {
+        width: 72px;
+        height: 76px;
+        border-radius: 16px 16px 22px 22px;
+    }
+
+    .weight::before {
+        top: -12px;
+        width: 28px;
+        height: 16px;
+        border-width: 4px;
+    }
+
+    .weightValue {
+        font-size: 18px;
+    }
+
+    .weightUnit {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    #ui {
+        width: min(95vw, 420px);
+        border-radius: 14px;
+    }
+
+    #title {
+        font-size: 16px;
+    }
+
+    #mission {
+        font-size: 13px;
+    }
+
+    #scoreBoard {
+        grid-template-columns: 1fr;
+    }
+
+    #totalInfo {
+        flex-direction: column;
+    }
+
+    .buttonRow button {
+        flex-basis: 100%;
+        font-size: 13px;
+        padding: 11px 10px;
+    }
+
+    #scale {
+        height: 250px;
+    }
+
+    #beam {
+        top: 86px;
+        width: min(320px, 80vw);
+        height: 16px;
+    }
+
+    #pivot {
+        top: 74px;
+        width: 28px;
+        height: 28px;
+    }
+
+    #base {
+        width: 70px;
+        height: 132px;
+        bottom: 24px;
+    }
+
+    #basePedestal {
+        width: 140px;
+        height: 30px;
+    }
+
+    .hanger {
+        top: 80px;
+        transform: scale(0.54);
+    }
+
+    #leftHanger {
+        left: max(-18px, calc(50% - min(202px, 34vw) - 60px));
+    }
+
+    #rightHanger {
+        right: max(-18px, calc(50% - min(202px, 34vw) - 60px));
+    }
+
+    #weightArea {
+        width: 95vw;
+        min-height: 152px;
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .weight {
+        width: 62px;
+        height: 66px;
+    }
+
+    .weightValue {
+        font-size: 16px;
+    }
+
+    .weightUnit {
+        font-size: 10px;
+    }
+
+    #codeOutput {
+        height: 180px;
     }
 }
 </style>
@@ -587,7 +808,7 @@ button:hover {
         </div>
         <div class="statCard">
             <span class="miniLabel">おもり数</span>
-            <strong id="weightCount">6</strong>
+            <strong id="weightCount">7</strong>
         </div>
     </div>
 
@@ -638,7 +859,7 @@ button:hover {
         </div>
     </div>
 
-    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="2404" data-label="2404g"><div class="weightValue">2404</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9331" data-label="9331g"><div class="weightValue">9331</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7434" data-label="7434g"><div class="weightValue">7434</div><div class="weightUnit">g</div></div><div class="weight" data-grams="6054" data-label="6054g"><div class="weightValue">6054</div><div class="weightUnit">g</div></div><div class="weight" data-grams="364" data-label="364g"><div class="weightValue">364</div><div class="weightUnit">g</div></div><div class="weight" data-grams="540" data-label="540g"><div class="weightValue">540</div><div class="weightUnit">g</div></div></div>
+    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="2362" data-label="2362g"><div class="weightValue">2362</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9312" data-label="9312g"><div class="weightValue">9312</div><div class="weightUnit">g</div></div><div class="weight" data-grams="6626" data-label="6626g"><div class="weightValue">6626</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9488" data-label="9488g"><div class="weightValue">9488</div><div class="weightUnit">g</div></div><div class="weight" data-grams="1797" data-label="1797g"><div class="weightValue">1797</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5697" data-label="5697g"><div class="weightValue">5697</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7230" data-label="7230g"><div class="weightValue">7230</div><div class="weightUnit">g</div></div></div>
 </div>
 
 <script>
