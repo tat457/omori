@@ -784,6 +784,194 @@ button:hover {
         height: 180px;
     }
 }
+
+@media (max-width: 932px) and (max-height: 430px) and (orientation: landscape) {
+    body {
+        overflow: hidden;
+    }
+
+    #ui {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 206px;
+        padding: 8px;
+        border-radius: 12px;
+        z-index: 30;
+    }
+
+    #title {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .controlRow,
+    #mission,
+    #scoreBoard,
+    #totalInfo,
+    #message,
+    #codeViewer {
+        margin-bottom: 6px;
+        margin-top: 0;
+    }
+
+    .controlRow label,
+    .miniLabel,
+    .totalPill {
+        font-size: 11px;
+    }
+
+    select,
+    button {
+        font-size: 12px;
+    }
+
+    select {
+        padding: 7px 8px;
+    }
+
+    #mission {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .statCard {
+        padding: 6px 7px;
+    }
+
+    .statCard strong {
+        font-size: 13px;
+    }
+
+    #totalInfo {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .totalPill {
+        padding: 5px 8px;
+    }
+
+    .buttonRow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .buttonRow button {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    #message {
+        min-height: 18px;
+        font-size: 12px;
+    }
+
+    #codeViewer {
+        position: fixed;
+        inset: 8px 8px 8px auto;
+        width: min(54vw, 420px);
+        z-index: 40;
+    }
+
+    #codeOutput {
+        height: calc(100dvh - 16px);
+        font-size: 9px;
+    }
+
+    #gameArea {
+        width: 100vw;
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 0;
+    }
+
+    #scale {
+        position: absolute;
+        left: calc(50% + 96px);
+        top: 38%;
+        width: 500px;
+        height: 210px;
+        transform: translate(-50%, -50%) scale(0.72);
+        transform-origin: center center;
+    }
+
+    #beam {
+        top: 96px;
+        width: 400px;
+        height: 18px;
+    }
+
+    #pivot {
+        top: 84px;
+        width: 30px;
+        height: 30px;
+    }
+
+    #base {
+        width: 74px;
+        height: 136px;
+        bottom: 26px;
+    }
+
+    #basePedestal {
+        width: 146px;
+        height: 28px;
+    }
+
+    #shadow {
+        width: 52%;
+        height: 20px;
+        bottom: 10px;
+    }
+
+    .hanger {
+        top: 90px;
+        transform: scale(0.68);
+    }
+
+    #leftHanger {
+        left: max(-6px, calc(50% - 220px));
+    }
+
+    #rightHanger {
+        right: max(-6px, calc(50% - 220px));
+    }
+
+    #weightArea {
+        position: absolute;
+        left: calc(50% + 96px);
+        bottom: 8px;
+        transform: translateX(-50%);
+        width: min(64vw, 560px);
+        min-height: 94px;
+        padding: 8px 10px;
+        gap: 8px;
+        border-radius: 18px;
+    }
+
+    .weight {
+        width: 56px;
+        height: 58px;
+        border-radius: 14px 14px 18px 18px;
+    }
+
+    .weight::before {
+        top: -10px;
+        width: 24px;
+        height: 12px;
+        border-width: 4px;
+    }
+
+    .weightValue {
+        font-size: 15px;
+    }
+
+    .weightUnit {
+        font-size: 9px;
+    }
+}
 </style>
 </head>
 <body>
@@ -799,7 +987,7 @@ button:hover {
         </select>
     </div>
 
-    <div id="mission">右を重くしよう！</div>
+    <div id="mission">左右を同じ重さにしよう！</div>
 
     <div id="scoreBoard">
         <div class="statCard">
@@ -808,7 +996,7 @@ button:hover {
         </div>
         <div class="statCard">
             <span class="miniLabel">おもり数</span>
-            <strong id="weightCount">7</strong>
+            <strong id="weightCount">5</strong>
         </div>
     </div>
 
@@ -859,7 +1047,7 @@ button:hover {
         </div>
     </div>
 
-    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="5629" data-label="5629g"><div class="weightValue">5629</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9763" data-label="9763g"><div class="weightValue">9763</div><div class="weightUnit">g</div></div><div class="weight" data-grams="110" data-label="110g"><div class="weightValue">110</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5450" data-label="5450g"><div class="weightValue">5450</div><div class="weightUnit">g</div></div><div class="weight" data-grams="412" data-label="412g"><div class="weightValue">412</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7240" data-label="7240g"><div class="weightValue">7240</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5455" data-label="5455g"><div class="weightValue">5455</div><div class="weightUnit">g</div></div></div>
+    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="4197" data-label="4197g"><div class="weightValue">4197</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5209" data-label="5209g"><div class="weightValue">5209</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5988" data-label="5988g"><div class="weightValue">5988</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5451" data-label="5451g"><div class="weightValue">5451</div><div class="weightUnit">g</div></div><div class="weight" data-grams="1797" data-label="1797g"><div class="weightValue">1797</div><div class="weightUnit">g</div></div></div>
 </div>
 
 <script>
