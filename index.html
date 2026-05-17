@@ -799,7 +799,7 @@ button:hover {
         </select>
     </div>
 
-    <div id="mission">左を重くしよう！</div>
+    <div id="mission">右を重くしよう！</div>
 
     <div id="scoreBoard">
         <div class="statCard">
@@ -859,7 +859,7 @@ button:hover {
         </div>
     </div>
 
-    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="2362" data-label="2362g"><div class="weightValue">2362</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9312" data-label="9312g"><div class="weightValue">9312</div><div class="weightUnit">g</div></div><div class="weight" data-grams="6626" data-label="6626g"><div class="weightValue">6626</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9488" data-label="9488g"><div class="weightValue">9488</div><div class="weightUnit">g</div></div><div class="weight" data-grams="1797" data-label="1797g"><div class="weightValue">1797</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5697" data-label="5697g"><div class="weightValue">5697</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7230" data-label="7230g"><div class="weightValue">7230</div><div class="weightUnit">g</div></div></div>
+    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="5629" data-label="5629g"><div class="weightValue">5629</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9763" data-label="9763g"><div class="weightValue">9763</div><div class="weightUnit">g</div></div><div class="weight" data-grams="110" data-label="110g"><div class="weightValue">110</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5450" data-label="5450g"><div class="weightValue">5450</div><div class="weightUnit">g</div></div><div class="weight" data-grams="412" data-label="412g"><div class="weightValue">412</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7240" data-label="7240g"><div class="weightValue">7240</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5455" data-label="5455g"><div class="weightValue">5455</div><div class="weightUnit">g</div></div></div>
 </div>
 
 <script>
@@ -1137,13 +1137,14 @@ function addDrag(element) {
             return;
         }
 
+        event.preventDefault();
         dragging = true;
         const rect = element.getBoundingClientRect();
         offsetX = event.clientX - rect.left;
         offsetY = event.clientY - rect.top;
 
         document.body.appendChild(element);
-        element.style.position = "absolute";
+        element.style.position = "fixed";
         element.style.left = `${rect.left}px`;
         element.style.top = `${rect.top}px`;
         element.style.zIndex = "1000";
@@ -1167,7 +1168,7 @@ function snapToZone(element, zone, index) {
     const column = index % 3;
 
     document.body.appendChild(element);
-    element.style.position = "absolute";
+    element.style.position = "fixed";
     element.style.left = `${rect.left + 10 + column * horizontalGap}px`;
     element.style.top = `${rect.top + 6 + row * verticalGap}px`;
     element.style.zIndex = "12";
