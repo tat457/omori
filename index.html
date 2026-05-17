@@ -1,564 +1,1036 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>天秤バランスゲーム</title>
-
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-body{
-    font-family:sans-serif;
+:root {
+    --sky-top: #dff4ff;
+    --sky-bottom: #f7fbff;
+    --panel-bg: rgba(255, 255, 255, 0.92);
+    --panel-border: rgba(85, 110, 130, 0.18);
+    --metal-1: #eef3f8;
+    --metal-2: #98a8b8;
+    --metal-3: #5d6772;
+    --gold-1: #f8df86;
+    --gold-2: #d49a27;
+    --gold-3: #85561a;
+    --wood-1: #926134;
+    --wood-2: #6f421d;
+    --accent: #2e7be9;
+    --accent-dark: #1d5dba;
+    --good: #1e8c3a;
+    --bad: #c72c41;
+}
+
+body {
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    color: #17324a;
     background:
-        linear-gradient(#bfe7ff,#eaf7ff);
-    overflow:hidden;
-    user-select:none;
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 40%),
+        linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 64%, #e1f0da 64%, #b9d890 100%);
 }
 
-#ui{
-    position:absolute;
-    top:10px;
-    left:10px;
-    z-index:10;
-    background:white;
-    padding:12px;
-    border-radius:12px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.2);
-    width:280px;
+body::after {
+    content: "";
+    position: fixed;
+    inset: auto 0 0 0;
+    height: 24vh;
+    background:
+        radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.22), transparent 18%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.16), transparent 14%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(67, 114, 31, 0.08));
+    pointer-events: none;
 }
 
-#title{
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:10px;
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    width: min(250px, calc(100vw - 20px));
+    padding: 10px 11px;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    background: var(--panel-bg);
+    box-shadow: 0 10px 28px rgba(35, 63, 92, 0.14);
+    backdrop-filter: blur(6px);
 }
 
-#mission{
-    font-size:18px;
-    margin-bottom:10px;
-    line-height:1.5;
+#title {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
 }
 
-#score{
-    margin-bottom:10px;
-    font-size:18px;
+.controlRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
-button{
-    padding:10px 16px;
-    border:none;
-    border-radius:10px;
-    background:#3a86ff;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
+.controlRow label,
+.miniLabel {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4c6478;
 }
 
-button:hover{
-    opacity:0.9;
+select,
+button {
+    border: none;
+    border-radius: 11px;
+    font-size: 14px;
 }
 
-#gameArea{
-    width:100vw;
-    height:100vh;
-    position:relative;
+select {
+    flex: 1;
+    padding: 8px 10px;
+    color: #17324a;
+    background: #f4f8fc;
+    border: 1px solid rgba(76, 100, 120, 0.16);
 }
 
-#scale{
-    position:absolute;
-    left:50%;
-    top:55%;
-    transform:translate(-50%,-50%);
-    width:700px;
-    height:350px;
+#mission {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    font-weight: 700;
 }
 
-#base{
-    position:absolute;
-    bottom:0;
-    left:50%;
-    transform:translateX(-50%);
-    width:80px;
-    height:170px;
-    background:#8b5a2b;
-    border-radius:12px;
+#scoreBoard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
-#beam{
-    position:absolute;
-    top:110px;
-    left:50%;
-    transform-origin:center center;
-    transform:translateX(-50%);
-    width:500px;
-    height:16px;
-    background:#5c4033;
-    border-radius:10px;
-    transition:0.4s;
+.statCard {
+    padding: 7px 8px;
+    border-radius: 12px;
+    background: #f5f9fd;
+    border: 1px solid rgba(76, 100, 120, 0.1);
 }
 
-.plate{
-    position:absolute;
-    width:170px;
-    height:18px;
-    background:#666;
-    border-radius:10px;
+.statCard strong {
+    display: block;
+    font-size: 15px;
+    margin-top: 2px;
 }
 
-#leftPlate{
-    left:70px;
-    top:155px;
+#totalInfo {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
-#rightPlate{
-    right:70px;
-    top:155px;
+.totalPill {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 700;
+    color: #34506a;
+    background: #eff6fc;
+    border: 1px solid rgba(76, 100, 120, 0.12);
+    border-radius: 999px;
+    padding: 6px 10px;
 }
 
-.chain{
-    position:absolute;
-    width:4px;
-    background:#555;
+.buttonRow {
+    display: flex;
+    gap: 8px;
 }
 
-#leftChain1{
-    left:110px;
-    top:120px;
-    height:45px;
+button {
+    padding: 10px 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
 }
 
-#leftChain2{
-    left:190px;
-    top:120px;
-    height:45px;
+button:hover {
+    opacity: 0.96;
+    transform: translateY(-1px);
 }
 
-#rightChain1{
-    right:190px;
-    top:120px;
-    height:45px;
+#checkBtn {
+    flex: 1;
+    background: linear-gradient(180deg, var(--accent), var(--accent-dark));
 }
 
-#rightChain2{
-    right:110px;
-    top:120px;
-    height:45px;
+#resetBtn {
+    background: linear-gradient(180deg, #9aa8b6, #718091);
 }
 
-.dropZone{
-    position:absolute;
-    width:180px;
-    height:120px;
-    top:170px;
-    border:3px dashed rgba(0,0,0,0.2);
-    border-radius:20px;
+#codeBtn {
+    background: linear-gradient(180deg, #3f9c7a, #2f7c61);
 }
 
-#leftZone{
-    left:65px;
+#message {
+    margin-top: 8px;
+    min-height: 24px;
+    font-size: 14px;
+    font-weight: 800;
 }
 
-#rightZone{
-    right:65px;
+.correct {
+    color: var(--good);
 }
 
-.weightArea{
-    position:absolute;
-    bottom:10px;
-    left:50%;
-    transform:translateX(-50%);
-    width:90%;
-    height:160px;
-    background:rgba(255,255,255,0.7);
-    border-radius:20px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:20px;
-    flex-wrap:wrap;
-    padding:10px;
+.wrong {
+    color: var(--bad);
 }
 
-.weight{
-    width:80px;
-    height:80px;
-    border-radius:18px;
-    background:linear-gradient(#ffcf5a,#ff9f1c);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:26px;
-    font-weight:bold;
-    color:#5a3300;
-    cursor:grab;
-    box-shadow:0 5px 10px rgba(0,0,0,0.25);
-    touch-action:none;
-    position:relative;
+#codeViewer {
+    margin-top: 8px;
+    display: none;
 }
 
-.weight::before{
-    content:"";
-    position:absolute;
-    top:-10px;
-    width:24px;
-    height:14px;
-    border:5px solid #8c5a00;
-    border-bottom:none;
-    border-radius:12px 12px 0 0;
+#codeViewer.open {
+    display: block;
 }
 
-.weight:active{
-    cursor:grabbing;
+#codeOutput {
+    width: 100%;
+    height: 180px;
+    resize: vertical;
+    border: 1px solid rgba(76, 100, 120, 0.18);
+    border-radius: 12px;
+    padding: 10px;
+    background: #f7fafc;
+    color: #17324a;
+    font-size: 11px;
+    line-height: 1.55;
+    font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+    white-space: pre;
 }
 
-#message{
-    margin-top:10px;
-    font-size:20px;
-    font-weight:bold;
-    min-height:30px;
+#gameArea {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
 }
 
-.correct{
-    color:#0a8f2d;
+#scale {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    transform: translate(-50%, -50%);
+    width: min(860px, 92vw);
+    height: min(460px, 54vh);
 }
 
-.wrong{
-    color:#d90429;
+#shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    width: 58%;
+    height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0) 72%);
+    filter: blur(8px);
 }
 
-@media (max-width:800px){
+#base {
+    position: absolute;
+    left: 50%;
+    bottom: 34px;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 220px;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(90deg, #6c3e1d, #9b6735 40%, #6c3e1d);
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12), 0 18px 22px rgba(0, 0, 0, 0.18);
+}
 
-    #scale{
-        transform:translate(-50%,-50%) scale(0.8);
+#basePedestal {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 42px;
+    border-radius: 28px;
+    background: linear-gradient(180deg, #a8753e, #6f421d);
+    box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.22), 0 10px 18px rgba(0, 0, 0, 0.2);
+}
+
+#pivot {
+    position: absolute;
+    left: 50%;
+    top: 120px;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fefefe, #afbac4 48%, #5d6772 78%);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.16), 0 6px 10px rgba(0, 0, 0, 0.18);
+    z-index: 3;
+}
+
+#beam {
+    position: absolute;
+    left: 50%;
+    top: 136px;
+    transform: translateX(-50%);
+    transform-origin: center center;
+    width: min(620px, 74vw);
+    height: 24px;
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.15) 30%, rgba(0, 0, 0, 0.14) 31%, rgba(0, 0, 0, 0.05)),
+        linear-gradient(90deg, #718190, #dbe3ea 18%, #8694a2 50%, #dbe3ea 82%, #5f6c79);
+    box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.4), inset 0 -3px 4px rgba(0, 0, 0, 0.16), 0 12px 14px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    transition: transform 0.35s ease;
+}
+
+.hanger {
+    position: absolute;
+    top: 126px;
+    width: 120px;
+    height: 110px;
+    z-index: 1;
+}
+
+#leftHanger {
+    left: max(32px, calc(50% - min(310px, 37vw) - 60px));
+}
+
+#rightHanger {
+    right: max(32px, calc(50% - min(310px, 37vw) - 60px));
+}
+
+.chain {
+    position: absolute;
+    width: 4px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #f5f8fb, #6b7985);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+.chain.left {
+    left: 18px;
+}
+
+.chain.center {
+    left: 58px;
+}
+
+.chain.right {
+    right: 18px;
+}
+
+.chain.top {
+    top: 0;
+    height: 54px;
+}
+
+.chain.bottom {
+    top: 54px;
+    height: 34px;
+}
+
+.plate {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 120px;
+    height: 26px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 25%, #ffffff, #bfcbd6 48%, #7d8b98 72%, #5d6772);
+    box-shadow: inset 0 -5px 6px rgba(0, 0, 0, 0.22), 0 10px 12px rgba(0, 0, 0, 0.14);
+}
+
+.dropZone {
+    position: absolute;
+    left: -24px;
+    bottom: -8px;
+    width: 168px;
+    height: 112px;
+    border: 2px dashed rgba(36, 64, 92, 0.18);
+    border-radius: 24px;
+}
+
+.dropZone.active {
+    border-color: rgba(46, 123, 233, 0.55);
+    background: rgba(46, 123, 233, 0.06);
+}
+
+#weightArea {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: min(980px, 96vw);
+    min-height: 180px;
+    padding: 18px;
+    border-radius: 28px 28px 18px 18px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 248, 252, 0.9)),
+        repeating-linear-gradient(90deg, rgba(148, 111, 67, 0.05) 0 14px, rgba(255, 255, 255, 0.05) 14px 28px);
+    border: 1px solid rgba(91, 109, 122, 0.12);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
+.weight {
+    position: relative;
+    width: 92px;
+    height: 96px;
+    border-radius: 18px 18px 24px 24px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 28%),
+        linear-gradient(180deg, var(--gold-1), var(--gold-2) 62%, var(--gold-3));
+    box-shadow:
+        inset 0 2px 5px rgba(255, 255, 255, 0.55),
+        inset 0 -9px 12px rgba(90, 51, 0, 0.18),
+        0 10px 16px rgba(86, 53, 9, 0.26);
+    border: 1px solid rgba(90, 51, 0, 0.2);
+    color: #593504;
+    cursor: grab;
+    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.weight::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 18px;
+    border: 5px solid #946116;
+    border-bottom: none;
+    border-radius: 16px 16px 0 0;
+    background: transparent;
+}
+
+.weight::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+
+.weight.dragging {
+    cursor: grabbing;
+    box-shadow:
+        inset 0 2px 5px rgba(255, 255, 255, 0.55),
+        inset 0 -9px 12px rgba(90, 51, 0, 0.18),
+        0 18px 24px rgba(41, 55, 69, 0.28);
+}
+
+.weightValue {
+    position: relative;
+    z-index: 1;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.weightUnit {
+    position: relative;
+    z-index: 1;
+    font-size: 14px;
+    font-weight: 800;
+    opacity: 0.88;
+}
+
+@media (max-width: 920px) {
+    #ui {
+        width: min(232px, calc(100vw - 16px));
+        top: 8px;
+        left: 8px;
+        padding: 9px 10px;
     }
 
-    #ui{
-        width:240px;
+    #title {
+        font-size: 17px;
     }
 
-    .weight{
-        width:65px;
-        height:65px;
-        font-size:22px;
+    #mission {
+        font-size: 14px;
+    }
+
+    #scale {
+        top: 50%;
+        width: 96vw;
+        height: 42vh;
+    }
+
+    #beam {
+        width: min(510px, 72vw);
+    }
+
+    .hanger {
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+
+    #weightArea {
+        min-height: 170px;
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .weight {
+        width: 78px;
+        height: 82px;
+    }
+
+    .weightValue {
+        font-size: 20px;
+    }
+
+    .weightUnit {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        overflow: auto;
+    }
+
+    #gameArea {
+        min-height: 860px;
+    }
+
+    #ui {
+        position: static;
+        margin: 8px auto 0;
+    }
+
+    #scale {
+        top: 290px;
+        height: 320px;
+    }
+
+    #beam {
+        top: 104px;
+        width: min(410px, 76vw);
+        height: 20px;
+    }
+
+    #pivot {
+        top: 90px;
+    }
+
+    #base {
+        width: 90px;
+        height: 170px;
+    }
+
+    #basePedestal {
+        width: 180px;
+    }
+
+    .hanger {
+        top: 98px;
+        transform: scale(0.74);
+    }
+
+    #weightArea {
+        top: 540px;
+        bottom: auto;
+        transform: translateX(-50%);
+        width: 94vw;
     }
 }
 </style>
 </head>
-
 <body>
-
 <div id="ui">
-    <div id="title">⚖️ 天秤ゲーム</div>
+    <div id="title">天秤バランスゲーム</div>
 
-    <div id="mission">
-        左右を同じ重さにしよう！
+    <div class="controlRow">
+        <label for="difficulty">難易度</label>
+        <select id="difficulty">
+            <option value="easy">やさしい</option>
+            <option value="normal" selected="">ふつう</option>
+            <option value="hard">むずかしい</option>
+        </select>
     </div>
 
-    <div id="score">
-        スコア: <span id="scoreValue">0</span>
+    <div id="mission">左を重くしよう！</div>
+
+    <div id="scoreBoard">
+        <div class="statCard">
+            <span class="miniLabel">スコア</span>
+            <strong id="scoreValue">0</strong>
+        </div>
+        <div class="statCard">
+            <span class="miniLabel">おもり数</span>
+            <strong id="weightCount">6</strong>
+        </div>
     </div>
 
-    <button id="checkBtn">判定</button>
+    <div id="totalInfo">
+        <div class="totalPill" id="leftTotal">左: 0g</div>
+        <div class="totalPill" id="rightTotal">右: 0g</div>
+    </div>
 
-    <div id="message"></div>
+    <div class="buttonRow">
+        <button id="checkBtn" type="button">判定</button>
+        <button id="resetBtn" type="button">やり直し</button>
+        <button id="codeBtn" type="button">コード表示</button>
+    </div>
+
+    <div id="message" aria-live="polite" class=""></div>
+
+    <div id="codeViewer" aria-live="polite" class="open">
+        <textarea id="codeOutput" readonly="" aria-label="HTMLコード表示欄"></textarea>
+    </div>
 </div>
 
 <div id="gameArea">
-
     <div id="scale">
-
-        <div id="beam"></div>
-
+        <div id="shadow"></div>
         <div id="base"></div>
+        <div id="basePedestal"></div>
+        <div id="beam" style="transform: translateX(-50%) rotate(0deg);"></div>
+        <div id="pivot"></div>
 
-        <div class="chain" id="leftChain1"></div>
-        <div class="chain" id="leftChain2"></div>
+        <div class="hanger" id="leftHanger">
+            <div class="chain top left"></div>
+            <div class="chain top center"></div>
+            <div class="chain top right"></div>
+            <div class="chain bottom left"></div>
+            <div class="chain bottom right"></div>
+            <div class="plate"></div>
+            <div class="dropZone" id="leftZone"></div>
+        </div>
 
-        <div class="chain" id="rightChain1"></div>
-        <div class="chain" id="rightChain2"></div>
-
-        <div class="plate" id="leftPlate"></div>
-        <div class="plate" id="rightPlate"></div>
-
-        <div class="dropZone" id="leftZone"></div>
-        <div class="dropZone" id="rightZone"></div>
-
+        <div class="hanger" id="rightHanger">
+            <div class="chain top left"></div>
+            <div class="chain top center"></div>
+            <div class="chain top right"></div>
+            <div class="chain bottom left"></div>
+            <div class="chain bottom right"></div>
+            <div class="plate"></div>
+            <div class="dropZone" id="rightZone"></div>
+        </div>
     </div>
 
-    <div class="weightArea" id="weightArea"></div>
-
+    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="2404" data-label="2404g"><div class="weightValue">2404</div><div class="weightUnit">g</div></div><div class="weight" data-grams="9331" data-label="9331g"><div class="weightValue">9331</div><div class="weightUnit">g</div></div><div class="weight" data-grams="7434" data-label="7434g"><div class="weightValue">7434</div><div class="weightUnit">g</div></div><div class="weight" data-grams="6054" data-label="6054g"><div class="weightValue">6054</div><div class="weightUnit">g</div></div><div class="weight" data-grams="364" data-label="364g"><div class="weightValue">364</div><div class="weightUnit">g</div></div><div class="weight" data-grams="540" data-label="540g"><div class="weightValue">540</div><div class="weightUnit">g</div></div></div>
 </div>
 
 <script>
-const weightArea = document.getElementById("weightArea")
-const leftZone = document.getElementById("leftZone")
-const rightZone = document.getElementById("rightZone")
-const beam = document.getElementById("beam")
-const message = document.getElementById("message")
-const scoreValue = document.getElementById("scoreValue")
-const missionText = document.getElementById("mission")
+const weightArea = document.getElementById("weightArea");
+const leftZone = document.getElementById("leftZone");
+const rightZone = document.getElementById("rightZone");
+const beam = document.getElementById("beam");
+const message = document.getElementById("message");
+const scoreValue = document.getElementById("scoreValue");
+const missionText = document.getElementById("mission");
+const difficultySelect = document.getElementById("difficulty");
+const leftTotal = document.getElementById("leftTotal");
+const rightTotal = document.getElementById("rightTotal");
+const weightCount = document.getElementById("weightCount");
+const checkBtn = document.getElementById("checkBtn");
+const resetBtn = document.getElementById("resetBtn");
+const codeBtn = document.getElementById("codeBtn");
+const codeViewer = document.getElementById("codeViewer");
+const codeOutput = document.getElementById("codeOutput");
 
-let score = 0
-
-let leftWeights = []
-let rightWeights = []
+let score = 0;
+let leftWeights = [];
+let rightWeights = [];
+let currentMission = null;
+let clearMessageTimer = 0;
+let missionTimer = 0;
 
 const missions = [
     {
-        text:"左右を同じ重さにしよう！",
-        check:(l,r)=>l===r
+        text: "左右を同じ重さにしよう！",
+        check: (left, right) => left === right
     },
     {
-        text:"左を重くしよう！",
-        check:(l,r)=>l>r
+        text: "左を重くしよう！",
+        check: (left, right) => left > right
     },
     {
-        text:"右を重くしよう！",
-        check:(l,r)=>r>l
+        text: "右を重くしよう！",
+        check: (left, right) => right > left
     }
-]
+];
 
-let currentMission
+const difficultySettings = {
+    easy: {
+        name: "やさしい",
+        minCount: 5,
+        maxCount: 7,
+        createValue: () => ({
+            grams: randomInt(1, 100),
+            label: null
+        })
+    },
+    normal: {
+        name: "ふつう",
+        minCount: 5,
+        maxCount: 7,
+        createValue: () => ({
+            grams: randomInt(100, 10000),
+            label: null
+        })
+    },
+    hard: {
+        name: "むずかしい",
+        minCount: 6,
+        maxCount: 8,
+        createValue: () => createMixedUnitWeight()
+    }
+};
 
-function newMission(){
-
-    currentMission =
-        missions[Math.floor(Math.random()*missions.length)]
-
-    missionText.textContent =
-        currentMission.text
-
-    resetGame()
+function randomInt(min, max) {
+    const safeMin = Math.ceil(min);
+    const safeMax = Math.floor(max);
+    return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
 }
 
-function resetGame(){
-
-    leftWeights=[]
-    rightWeights=[]
-
-    document.querySelectorAll(".weight")
-    .forEach(w=>w.remove())
-
-    createWeights()
-
-    updateScale()
+function pickMission() {
+    currentMission = missions[randomInt(0, missions.length - 1)];
+    missionText.textContent = currentMission.text;
 }
 
-function createWeights(){
-
-    const values = [1,2,3,5,10]
-
-    values.forEach((v,index)=>{
-
-        const w = document.createElement("div")
-
-        w.className = "weight"
-
-        w.textContent = v
-
-        w.dataset.value = v
-
-        w.style.left = "0px"
-        w.style.top = "0px"
-
-        addDrag(w)
-
-        weightArea.appendChild(w)
-    })
+function clearTimers() {
+    if (clearMessageTimer) {
+        clearTimeout(clearMessageTimer);
+        clearMessageTimer = 0;
+    }
+    if (missionTimer) {
+        clearTimeout(missionTimer);
+        missionTimer = 0;
+    }
 }
 
-function addDrag(el){
+function showMessage(text, type) {
+    message.textContent = text;
+    message.className = type;
+}
 
-    let offsetX = 0
-    let offsetY = 0
-    let dragging = false
+function clearMessageLater() {
+    if (clearMessageTimer) {
+        clearTimeout(clearMessageTimer);
+    }
+    clearMessageTimer = window.setTimeout(() => {
+        message.textContent = "";
+        message.className = "";
+    }, 1600);
+}
 
-    function startDrag(e){
+function newMission() {
+    clearTimers();
+    pickMission();
+    resetBoard();
+}
 
-        dragging = true
+function resetBoard() {
+    leftWeights = [];
+    rightWeights = [];
 
-        const rect = el.getBoundingClientRect()
+    document.querySelectorAll(".weight").forEach((weight) => {
+        weight.remove();
+    });
 
-        const clientX =
-            e.touches ? e.touches[0].clientX : e.clientX
+    createWeights();
+    updateScale();
+    showMessage("", "");
+}
 
-        const clientY =
-            e.touches ? e.touches[0].clientY : e.clientY
-
-        offsetX = clientX - rect.left
-        offsetY = clientY - rect.top
-
-        el.style.position = "absolute"
-        el.style.zIndex = 1000
+function createMixedUnitWeight() {
+    const useKilogramLabel = Math.random() < 0.5;
+    if (useKilogramLabel) {
+        const wholeKg = randomInt(1, 9);
+        return {
+            grams: wholeKg * 1000,
+            label: `${wholeKg}kg`
+        };
     }
 
-    function moveDrag(e){
+    return {
+        grams: randomInt(100, 900),
+        label: null
+    };
+}
 
-        if(!dragging) return
+function formatWeightLabel(grams, forcedLabel) {
+    if (forcedLabel) {
+        return forcedLabel;
+    }
+    return `${grams}g`;
+}
 
-        const clientX =
-            e.touches ? e.touches[0].clientX : e.clientX
+function splitWeightLabel(label) {
+    const matched = /^(\d+)(kg|g)$/.exec(label);
+    if (!matched) {
+        return { value: label, unit: "" };
+    }
+    return { value: matched[1], unit: matched[2] };
+}
 
-        const clientY =
-            e.touches ? e.touches[0].clientY : e.clientY
+function createWeightElement(grams, label) {
+    const weight = document.createElement("div");
+    const labelParts = splitWeightLabel(label);
 
-        el.style.left =
-            (clientX - offsetX) + "px"
+    weight.className = "weight";
+    weight.dataset.grams = String(grams);
+    weight.dataset.label = label;
 
-        el.style.top =
-            (clientY - offsetY) + "px"
+    const valueEl = document.createElement("div");
+    valueEl.className = "weightValue";
+    valueEl.textContent = labelParts.value;
+
+    const unitEl = document.createElement("div");
+    unitEl.className = "weightUnit";
+    unitEl.textContent = labelParts.unit;
+
+    weight.appendChild(valueEl);
+    weight.appendChild(unitEl);
+    addDrag(weight);
+    return weight;
+}
+
+function createWeights() {
+    const setting = difficultySettings[difficultySelect.value] || difficultySettings.normal;
+    const count = randomInt(setting.minCount, setting.maxCount);
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < count; i += 1) {
+        const created = setting.createValue();
+        const grams = created.grams;
+        const label = formatWeightLabel(grams, created.label);
+        fragment.appendChild(createWeightElement(grams, label));
     }
 
-    function endDrag(){
+    weightArea.appendChild(fragment);
+    weightCount.textContent = String(count);
+}
 
-        if(!dragging) return
+function removeFromZones(target) {
+    leftWeights = leftWeights.filter((item) => item !== target);
+    rightWeights = rightWeights.filter((item) => item !== target);
+}
 
-        dragging = false
+function alignZoneWeights(zoneList, zoneElement) {
+    zoneList.forEach((weight, index) => {
+        snapToZone(weight, zoneElement, index);
+    });
+}
 
-        const rect =
-            el.getBoundingClientRect()
+function getZoneRect(zone) {
+    return zone.getBoundingClientRect();
+}
 
-        const leftRect =
-            leftZone.getBoundingClientRect()
+function isInsideZone(centerX, centerY, zoneRect) {
+    return (
+        centerX >= zoneRect.left &&
+        centerX <= zoneRect.right &&
+        centerY >= zoneRect.top &&
+        centerY <= zoneRect.bottom
+    );
+}
 
-        const rightRect =
-            rightZone.getBoundingClientRect()
+function addDrag(element) {
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
 
-        const centerX =
-            rect.left + rect.width/2
-
-        const centerY =
-            rect.top + rect.height/2
-
-        const value =
-            Number(el.dataset.value)
-
-        leftWeights =
-            leftWeights.filter(v=>v!==el)
-
-        rightWeights =
-            rightWeights.filter(v=>v!==el)
-
-        if(
-            centerX > leftRect.left &&
-            centerX < leftRect.right &&
-            centerY > leftRect.top &&
-            centerY < leftRect.bottom
-        ){
-
-            leftWeights.push(el)
-
-            snapToZone(el,leftZone,leftWeights.length)
-
+    const onPointerMove = (event) => {
+        if (!dragging) {
+            return;
         }
-        else if(
-            centerX > rightRect.left &&
-            centerX < rightRect.right &&
-            centerY > rightRect.top &&
-            centerY < rightRect.bottom
-        ){
 
-            rightWeights.push(el)
+        event.preventDefault();
+        element.style.left = `${event.clientX - offsetX}px`;
+        element.style.top = `${event.clientY - offsetY}px`;
+    };
 
-            snapToZone(el,rightZone,rightWeights.length)
-
-        }
-        else{
-
-            weightArea.appendChild(el)
-
-            el.style.position="relative"
-            el.style.left="0px"
-            el.style.top="0px"
+    const onPointerUp = (event) => {
+        if (!dragging) {
+            return;
         }
 
-        updateScale()
+        dragging = false;
+        element.classList.remove("dragging");
+        element.releasePointerCapture(event.pointerId);
+
+        leftZone.classList.remove("active");
+        rightZone.classList.remove("active");
+
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const leftRect = getZoneRect(leftZone);
+        const rightRect = getZoneRect(rightZone);
+
+        removeFromZones(element);
+
+        if (isInsideZone(centerX, centerY, leftRect)) {
+            leftWeights.push(element);
+            snapToZone(element, leftZone, leftWeights.length - 1);
+            alignZoneWeights(leftWeights, leftZone);
+        } else if (isInsideZone(centerX, centerY, rightRect)) {
+            rightWeights.push(element);
+            snapToZone(element, rightZone, rightWeights.length - 1);
+            alignZoneWeights(rightWeights, rightZone);
+        } else {
+            weightArea.appendChild(element);
+            element.style.position = "relative";
+            element.style.left = "0px";
+            element.style.top = "0px";
+            element.style.zIndex = "1";
+        }
+
+        updateScale();
+    };
+
+    element.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0 && event.pointerType !== "touch") {
+            return;
+        }
+
+        dragging = true;
+        const rect = element.getBoundingClientRect();
+        offsetX = event.clientX - rect.left;
+        offsetY = event.clientY - rect.top;
+
+        document.body.appendChild(element);
+        element.style.position = "absolute";
+        element.style.left = `${rect.left}px`;
+        element.style.top = `${rect.top}px`;
+        element.style.zIndex = "1000";
+        element.classList.add("dragging");
+        element.setPointerCapture(event.pointerId);
+
+        leftZone.classList.add("active");
+        rightZone.classList.add("active");
+    });
+
+    element.addEventListener("pointermove", onPointerMove);
+    element.addEventListener("pointerup", onPointerUp);
+    element.addEventListener("pointercancel", onPointerUp);
+}
+
+function snapToZone(element, zone, index) {
+    const rect = zone.getBoundingClientRect();
+    const horizontalGap = 44;
+    const verticalGap = 24;
+    const row = Math.floor(index / 3);
+    const column = index % 3;
+
+    document.body.appendChild(element);
+    element.style.position = "absolute";
+    element.style.left = `${rect.left + 10 + column * horizontalGap}px`;
+    element.style.top = `${rect.top + 6 + row * verticalGap}px`;
+    element.style.zIndex = "12";
+}
+
+function total(weights) {
+    return weights.reduce((sum, weight) => sum + Number(weight.dataset.grams || 0), 0);
+}
+
+function formatTotal(grams) {
+    if (difficultySelect.value === "hard") {
+        if (grams >= 1000 && grams % 1000 === 0) {
+            return `${grams / 1000}kg`;
+        }
+        const kg = Math.floor(grams / 1000);
+        const rest = grams % 1000;
+        if (kg > 0 && rest > 0) {
+            return `${kg}kg ${rest}g`;
+        }
+    }
+    return `${grams}g`;
+}
+
+function updateScale() {
+    const left = total(leftWeights);
+    const right = total(rightWeights);
+    let angle = (right - left) / 280;
+
+    if (angle > 16) {
+        angle = 16;
+    }
+    if (angle < -16) {
+        angle = -16;
     }
 
-    el.addEventListener("mousedown",startDrag)
-    document.addEventListener("mousemove",moveDrag)
-    document.addEventListener("mouseup",endDrag)
-
-    el.addEventListener("touchstart",startDrag)
-    document.addEventListener("touchmove",moveDrag,{passive:false})
-    document.addEventListener("touchend",endDrag)
+    beam.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    leftTotal.textContent = `左: ${formatTotal(left)}`;
+    rightTotal.textContent = `右: ${formatTotal(right)}`;
 }
 
-function snapToZone(el,zone,index){
+function checkAnswer() {
+    const left = total(leftWeights);
+    const right = total(rightWeights);
+    const correct = currentMission && currentMission.check(left, right);
 
-    document.body.appendChild(el)
+    clearTimers();
 
-    const rect = zone.getBoundingClientRect()
-
-    el.style.left =
-        rect.left + 15 + (index-1)*30 + "px"
-
-    el.style.top =
-        rect.top + 20 + "px"
-}
-
-function total(list){
-
-    return list.reduce(
-        (sum,w)=>sum+Number(w.dataset.value),
-        0
-    )
-}
-
-function updateScale(){
-
-    const left = total(leftWeights)
-    const right = total(rightWeights)
-
-    let angle = (right-left)*4
-
-    if(angle > 18) angle = 18
-    if(angle < -18) angle = -18
-
-    beam.style.transform =
-        `translateX(-50%) rotate(${angle}deg)`
-}
-
-document.getElementById("checkBtn")
-.addEventListener("click",()=>{
-
-    const left = total(leftWeights)
-    const right = total(rightWeights)
-
-    const ok =
-        currentMission.check(left,right)
-
-    if(ok){
-
-        score++
-
-        scoreValue.textContent = score
-
-        message.textContent = "⭕ 正解！"
-
-        message.className = "correct"
-
-        setTimeout(()=>{
-            message.textContent=""
-            newMission()
-        },1200)
-
-    }else{
-
-        message.textContent =
-            `❌ ちがう！ 左:${left}kg 右:${right}kg`
-
-        message.className = "wrong"
+    if (correct) {
+        score += 1;
+        scoreValue.textContent = String(score);
+        showMessage("正解！ 次の問題へ進みます。", "correct");
+        missionTimer = window.setTimeout(() => {
+            newMission();
+        }, 1200);
+        return;
     }
-})
 
-newMission()
+    showMessage(`ちがう！ 左:${formatTotal(left)} 右:${formatTotal(right)}`, "wrong");
+    clearMessageLater();
+}
+
+function toggleCodeView() {
+    const isOpen = codeViewer.classList.toggle("open");
+    if (isOpen) {
+        codeOutput.value = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
+        codeBtn.textContent = "コード非表示";
+    } else {
+        codeBtn.textContent = "コード表示";
+    }
+}
+
+difficultySelect.addEventListener("change", () => {
+    score = 0;
+    scoreValue.textContent = "0";
+    newMission();
+});
+
+checkBtn.addEventListener("click", checkAnswer);
+resetBtn.addEventListener("click", resetBoard);
+codeBtn.addEventListener("click", toggleCodeView);
+
+pickMission();
+resetBoard();
 </script>
 
-</body>
-</html>
+
+</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483000;"></div></html>
