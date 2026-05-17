@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="ja"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>天秤バランスゲーム</title>
 <style>
 * {
@@ -15,14 +16,9 @@
     --sky-bottom: #f7fbff;
     --panel-bg: rgba(255, 255, 255, 0.92);
     --panel-border: rgba(85, 110, 130, 0.18);
-    --metal-1: #eef3f8;
-    --metal-2: #98a8b8;
-    --metal-3: #5d6772;
     --gold-1: #f8df86;
     --gold-2: #d49a27;
     --gold-3: #85561a;
-    --wood-1: #926134;
-    --wood-2: #6f421d;
     --accent: #2e7be9;
     --accent-dark: #1d5dba;
     --good: #1e8c3a;
@@ -174,10 +170,6 @@ button:hover {
     background: linear-gradient(180deg, #9aa8b6, #718091);
 }
 
-#codeBtn {
-    background: linear-gradient(180deg, #3f9c7a, #2f7c61);
-}
-
 #message {
     margin-top: 8px;
     min-height: 24px;
@@ -191,30 +183,6 @@ button:hover {
 
 .wrong {
     color: var(--bad);
-}
-
-#codeViewer {
-    margin-top: 8px;
-    display: none;
-}
-
-#codeViewer.open {
-    display: block;
-}
-
-#codeOutput {
-    width: 100%;
-    height: 180px;
-    resize: vertical;
-    border: 1px solid rgba(76, 100, 120, 0.18);
-    border-radius: 12px;
-    padding: 10px;
-    background: #f7fafc;
-    color: #17324a;
-    font-size: 11px;
-    line-height: 1.55;
-    font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
-    white-space: pre;
 }
 
 #gameArea {
@@ -539,10 +507,6 @@ button:hover {
     .buttonRow button {
         flex: 1 1 calc(50% - 4px);
     }
-
-    #codeBtn {
-        flex-basis: 100%;
-    }
 }
 
 @media (max-width: 768px) {
@@ -583,9 +547,7 @@ button:hover {
         width: 100%;
     }
 
-    #scoreBoard,
-    #totalInfo {
-        grid-template-columns: 1fr 1fr;
+    #scoreBoard {
         width: 100%;
     }
 
@@ -596,15 +558,6 @@ button:hover {
     .buttonRow button {
         flex: 1 1 calc(50% - 4px);
         min-height: 44px;
-    }
-
-    #codeBtn {
-        flex-basis: 100%;
-    }
-
-    #codeOutput {
-        height: 220px;
-        font-size: 10px;
     }
 
     #scale {
@@ -779,10 +732,6 @@ button:hover {
     .weightUnit {
         font-size: 10px;
     }
-
-    #codeOutput {
-        height: 180px;
-    }
 }
 
 @media (max-width: 932px) and (max-height: 430px) and (orientation: landscape) {
@@ -809,8 +758,7 @@ button:hover {
     #mission,
     #scoreBoard,
     #totalInfo,
-    #message,
-    #codeViewer {
+    #message {
         margin-bottom: 6px;
         margin-top: 0;
     }
@@ -866,18 +814,6 @@ button:hover {
     #message {
         min-height: 18px;
         font-size: 12px;
-    }
-
-    #codeViewer {
-        position: fixed;
-        inset: 8px 8px 8px auto;
-        width: min(54vw, 420px);
-        z-index: 40;
-    }
-
-    #codeOutput {
-        height: calc(100dvh - 16px);
-        font-size: 9px;
     }
 
     #gameArea {
@@ -982,7 +918,7 @@ button:hover {
         <label for="difficulty">難易度</label>
         <select id="difficulty">
             <option value="easy">やさしい</option>
-            <option value="normal" selected="">ふつう</option>
+            <option value="normal" selected>ふつう</option>
             <option value="hard">むずかしい</option>
         </select>
     </div>
@@ -996,7 +932,7 @@ button:hover {
         </div>
         <div class="statCard">
             <span class="miniLabel">おもり数</span>
-            <strong id="weightCount">5</strong>
+            <strong id="weightCount">0</strong>
         </div>
     </div>
 
@@ -1008,14 +944,9 @@ button:hover {
     <div class="buttonRow">
         <button id="checkBtn" type="button">判定</button>
         <button id="resetBtn" type="button">やり直し</button>
-        <button id="codeBtn" type="button">コード表示</button>
     </div>
 
-    <div id="message" aria-live="polite" class=""></div>
-
-    <div id="codeViewer" aria-live="polite" class="open">
-        <textarea id="codeOutput" readonly="" aria-label="HTMLコード表示欄"></textarea>
-    </div>
+    <div id="message" aria-live="polite"></div>
 </div>
 
 <div id="gameArea">
@@ -1023,7 +954,7 @@ button:hover {
         <div id="shadow"></div>
         <div id="base"></div>
         <div id="basePedestal"></div>
-        <div id="beam" style="transform: translateX(-50%) rotate(0deg);"></div>
+        <div id="beam"></div>
         <div id="pivot"></div>
 
         <div class="hanger" id="leftHanger">
@@ -1047,7 +978,7 @@ button:hover {
         </div>
     </div>
 
-    <div id="weightArea" aria-label="おもり置き場"><div class="weight" data-grams="4197" data-label="4197g"><div class="weightValue">4197</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5209" data-label="5209g"><div class="weightValue">5209</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5988" data-label="5988g"><div class="weightValue">5988</div><div class="weightUnit">g</div></div><div class="weight" data-grams="5451" data-label="5451g"><div class="weightValue">5451</div><div class="weightUnit">g</div></div><div class="weight" data-grams="1797" data-label="1797g"><div class="weightValue">1797</div><div class="weightUnit">g</div></div></div>
+    <div id="weightArea" aria-label="おもり置き場"></div>
 </div>
 
 <script>
@@ -1064,9 +995,6 @@ const rightTotal = document.getElementById("rightTotal");
 const weightCount = document.getElementById("weightCount");
 const checkBtn = document.getElementById("checkBtn");
 const resetBtn = document.getElementById("resetBtn");
-const codeBtn = document.getElementById("codeBtn");
-const codeViewer = document.getElementById("codeViewer");
-const codeOutput = document.getElementById("codeOutput");
 
 let score = 0;
 let leftWeights = [];
@@ -1092,7 +1020,6 @@ const missions = [
 
 const difficultySettings = {
     easy: {
-        name: "やさしい",
         minCount: 5,
         maxCount: 7,
         createValue: () => ({
@@ -1101,7 +1028,6 @@ const difficultySettings = {
         })
     },
     normal: {
-        name: "ふつう",
         minCount: 5,
         maxCount: 7,
         createValue: () => ({
@@ -1110,7 +1036,6 @@ const difficultySettings = {
         })
     },
     hard: {
-        name: "むずかしい",
         minCount: 6,
         maxCount: 8,
         createValue: () => createMixedUnitWeight()
@@ -1418,16 +1343,6 @@ function checkAnswer() {
     clearMessageLater();
 }
 
-function toggleCodeView() {
-    const isOpen = codeViewer.classList.toggle("open");
-    if (isOpen) {
-        codeOutput.value = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
-        codeBtn.textContent = "コード非表示";
-    } else {
-        codeBtn.textContent = "コード表示";
-    }
-}
-
 difficultySelect.addEventListener("change", () => {
     score = 0;
     scoreValue.textContent = "0";
@@ -1436,11 +1351,9 @@ difficultySelect.addEventListener("change", () => {
 
 checkBtn.addEventListener("click", checkAnswer);
 resetBtn.addEventListener("click", resetBoard);
-codeBtn.addEventListener("click", toggleCodeView);
 
 pickMission();
 resetBoard();
 </script>
-
-
-</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483000;"></div></html>
+</body>
+</html>
