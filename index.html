@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>天秤バランスゲーム</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:sans-serif;
+    background:
+        linear-gradient(#bfe7ff,#eaf7ff);
+    overflow:hidden;
+    user-select:none;
+}
+
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:10;
+    background:white;
+    padding:12px;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    width:280px;
+}
+
+#title{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+#mission{
+    font-size:18px;
+    margin-bottom:10px;
+    line-height:1.5;
+}
+
+#score{
+    margin-bottom:10px;
+    font-size:18px;
+}
+
+button{
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    background:#3a86ff;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+#gameArea{
+    width:100vw;
+    height:100vh;
+    position:relative;
+}
+
+#scale{
+    position:absolute;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%);
+    width:700px;
+    height:350px;
+}
+
+#base{
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:80px;
+    height:170px;
+    background:#8b5a2b;
+    border-radius:12px;
+}
+
+#beam{
+    position:absolute;
+    top:110px;
+    left:50%;
+    transform-origin:center center;
+    transform:translateX(-50%);
+    width:500px;
+    height:16px;
+    background:#5c4033;
+    border-radius:10px;
+    transition:0.4s;
+}
+
+.plate{
+    position:absolute;
+    width:170px;
+    height:18px;
+    background:#666;
+    border-radius:10px;
+}
+
+#leftPlate{
+    left:70px;
+    top:155px;
+}
+
+#rightPlate{
+    right:70px;
+    top:155px;
+}
+
+.chain{
+    position:absolute;
+    width:4px;
+    background:#555;
+}
+
+#leftChain1{
+    left:110px;
+    top:120px;
+    height:45px;
+}
+
+#leftChain2{
+    left:190px;
+    top:120px;
+    height:45px;
+}
+
+#rightChain1{
+    right:190px;
+    top:120px;
+    height:45px;
+}
+
+#rightChain2{
+    right:110px;
+    top:120px;
+    height:45px;
+}
+
+.dropZone{
+    position:absolute;
+    width:180px;
+    height:120px;
+    top:170px;
+    border:3px dashed rgba(0,0,0,0.2);
+    border-radius:20px;
+}
+
+#leftZone{
+    left:65px;
+}
+
+#rightZone{
+    right:65px;
+}
+
+.weightArea{
+    position:absolute;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    height:160px;
+    background:rgba(255,255,255,0.7);
+    border-radius:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+    padding:10px;
+}
+
+.weight{
+    width:80px;
+    height:80px;
+    border-radius:18px;
+    background:linear-gradient(#ffcf5a,#ff9f1c);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    font-weight:bold;
+    color:#5a3300;
+    cursor:grab;
+    box-shadow:0 5px 10px rgba(0,0,0,0.25);
+    touch-action:none;
+    position:relative;
+}
+
+.weight::before{
+    content:"";
+    position:absolute;
+    top:-10px;
+    width:24px;
+    height:14px;
+    border:5px solid #8c5a00;
+    border-bottom:none;
+    border-radius:12px 12px 0 0;
+}
+
+.weight:active{
+    cursor:grabbing;
+}
+
+#message{
+    margin-top:10px;
+    font-size:20px;
+    font-weight:bold;
+    min-height:30px;
+}
+
+.correct{
+    color:#0a8f2d;
+}
+
+.wrong{
+    color:#d90429;
+}
+
+@media (max-width:800px){
+
+    #scale{
+        transform:translate(-50%,-50%) scale(0.8);
+    }
+
+    #ui{
+        width:240px;
+    }
+
+    .weight{
+        width:65px;
+        height:65px;
+        font-size:22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+    <div id="title">⚖️ 天秤ゲーム</div>
+
+    <div id="mission">
+        左右を同じ重さにしよう！
+    </div>
+
+    <div id="score">
+        スコア: <span id="scoreValue">0</span>
+    </div>
+
+    <button id="checkBtn">判定</button>
+
+    <div id="message"></div>
+</div>
+
+<div id="gameArea">
+
+    <div id="scale">
+
+        <div id="beam"></div>
+
+        <div id="base"></div>
+
+        <div class="chain" id="leftChain1"></div>
+        <div class="chain" id="leftChain2"></div>
+
+        <div class="chain" id="rightChain1"></div>
+        <div class="chain" id="rightChain2"></div>
+
+        <div class="plate" id="leftPlate"></div>
+        <div class="plate" id="rightPlate"></div>
+
+        <div class="dropZone" id="leftZone"></div>
+        <div class="dropZone" id="rightZone"></div>
+
+    </div>
+
+    <div class="weightArea" id="weightArea"></div>
+
+</div>
+
+<script>
+const weightArea = document.getElementById("weightArea")
+const leftZone = document.getElementById("leftZone")
+const rightZone = document.getElementById("rightZone")
+const beam = document.getElementById("beam")
+const message = document.getElementById("message")
+const scoreValue = document.getElementById("scoreValue")
+const missionText = document.getElementById("mission")
+
+let score = 0
+
+let leftWeights = []
+let rightWeights = []
+
+const missions = [
+    {
+        text:"左右を同じ重さにしよう！",
+        check:(l,r)=>l===r
+    },
+    {
+        text:"左を重くしよう！",
+        check:(l,r)=>l>r
+    },
+    {
+        text:"右を重くしよう！",
+        check:(l,r)=>r>l
+    }
+]
+
+let currentMission
+
+function newMission(){
+
+    currentMission =
+        missions[Math.floor(Math.random()*missions.length)]
+
+    missionText.textContent =
+        currentMission.text
+
+    resetGame()
+}
+
+function resetGame(){
+
+    leftWeights=[]
+    rightWeights=[]
+
+    document.querySelectorAll(".weight")
+    .forEach(w=>w.remove())
+
+    createWeights()
+
+    updateScale()
+}
+
+function createWeights(){
+
+    const values = [1,2,3,5,10]
+
+    values.forEach((v,index)=>{
+
+        const w = document.createElement("div")
+
+        w.className = "weight"
+
+        w.textContent = v
+
+        w.dataset.value = v
+
+        w.style.left = "0px"
+        w.style.top = "0px"
+
+        addDrag(w)
+
+        weightArea.appendChild(w)
+    })
+}
+
+function addDrag(el){
+
+    let offsetX = 0
+    let offsetY = 0
+    let dragging = false
+
+    function startDrag(e){
+
+        dragging = true
+
+        const rect = el.getBoundingClientRect()
+
+        const clientX =
+            e.touches ? e.touches[0].clientX : e.clientX
+
+        const clientY =
+            e.touches ? e.touches[0].clientY : e.clientY
+
+        offsetX = clientX - rect.left
+        offsetY = clientY - rect.top
+
+        el.style.position = "absolute"
+        el.style.zIndex = 1000
+    }
+
+    function moveDrag(e){
+
+        if(!dragging) return
+
+        const clientX =
+            e.touches ? e.touches[0].clientX : e.clientX
+
+        const clientY =
+            e.touches ? e.touches[0].clientY : e.clientY
+
+        el.style.left =
+            (clientX - offsetX) + "px"
+
+        el.style.top =
+            (clientY - offsetY) + "px"
+    }
+
+    function endDrag(){
+
+        if(!dragging) return
+
+        dragging = false
+
+        const rect =
+            el.getBoundingClientRect()
+
+        const leftRect =
+            leftZone.getBoundingClientRect()
+
+        const rightRect =
+            rightZone.getBoundingClientRect()
+
+        const centerX =
+            rect.left + rect.width/2
+
+        const centerY =
+            rect.top + rect.height/2
+
+        const value =
+            Number(el.dataset.value)
+
+        leftWeights =
+            leftWeights.filter(v=>v!==el)
+
+        rightWeights =
+            rightWeights.filter(v=>v!==el)
+
+        if(
+            centerX > leftRect.left &&
+            centerX < leftRect.right &&
+            centerY > leftRect.top &&
+            centerY < leftRect.bottom
+        ){
+
+            leftWeights.push(el)
+
+            snapToZone(el,leftZone,leftWeights.length)
+
+        }
+        else if(
+            centerX > rightRect.left &&
+            centerX < rightRect.right &&
+            centerY > rightRect.top &&
+            centerY < rightRect.bottom
+        ){
+
+            rightWeights.push(el)
+
+            snapToZone(el,rightZone,rightWeights.length)
+
+        }
+        else{
+
+            weightArea.appendChild(el)
+
+            el.style.position="relative"
+            el.style.left="0px"
+            el.style.top="0px"
+        }
+
+        updateScale()
+    }
+
+    el.addEventListener("mousedown",startDrag)
+    document.addEventListener("mousemove",moveDrag)
+    document.addEventListener("mouseup",endDrag)
+
+    el.addEventListener("touchstart",startDrag)
+    document.addEventListener("touchmove",moveDrag,{passive:false})
+    document.addEventListener("touchend",endDrag)
+}
+
+function snapToZone(el,zone,index){
+
+    document.body.appendChild(el)
+
+    const rect = zone.getBoundingClientRect()
+
+    el.style.left =
+        rect.left + 15 + (index-1)*30 + "px"
+
+    el.style.top =
+        rect.top + 20 + "px"
+}
+
+function total(list){
+
+    return list.reduce(
+        (sum,w)=>sum+Number(w.dataset.value),
+        0
+    )
+}
+
+function updateScale(){
+
+    const left = total(leftWeights)
+    const right = total(rightWeights)
+
+    let angle = (right-left)*4
+
+    if(angle > 18) angle = 18
+    if(angle < -18) angle = -18
+
+    beam.style.transform =
+        `translateX(-50%) rotate(${angle}deg)`
+}
+
+document.getElementById("checkBtn")
+.addEventListener("click",()=>{
+
+    const left = total(leftWeights)
+    const right = total(rightWeights)
+
+    const ok =
+        currentMission.check(left,right)
+
+    if(ok){
+
+        score++
+
+        scoreValue.textContent = score
+
+        message.textContent = "⭕ 正解！"
+
+        message.className = "correct"
+
+        setTimeout(()=>{
+            message.textContent=""
+            newMission()
+        },1200)
+
+    }else{
+
+        message.textContent =
+            `❌ ちがう！ 左:${left}kg 右:${right}kg`
+
+        message.className = "wrong"
+    }
+})
+
+newMission()
+</script>
+
+</body>
+</html>
